@@ -1,4 +1,49 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [GraphQL Quick-Start Guide](#graphql-quick-start-guide)
+  - [Prerequisites](#prerequisites)
+- [Server-Side Development](#server-side-development)
+  - [Required libraries](#required-libraries)
+  - [Directory structure](#directory-structure)
+  - [Setting up the GraphQL server](#setting-up-the-graphql-server)
+  - [Defining the Schema](#defining-the-schema)
+    - [Define Types](#define-types)
+    - [Define Root-Level Query Type](#define-root-level-query-type)
+      - [Example](#example)
+    - [Define Resolvers](#define-resolvers)
+      - [Implement the `RootQuery` resolvers](#implement-the-rootquery-resolvers)
+      - [Implement the `Item` resolvers](#implement-the-item-resolvers)
+    - [Resolver Summary](#resolver-summary)
+  - [Putting the Schema + Resolvers Together](#putting-the-schema--resolvers-together)
+  - [Run the server](#run-the-server)
+- [Client-side Development](#client-side-development)
+  - [Required libraries](#required-libraries-1)
+  - [Directory structure](#directory-structure-1)
+  - [Apollo Client + Routing setup](#apollo-client--routing-setup)
+  - [Define queries](#define-queries)
+  - [`ItemList` component](#itemlist-component)
+  - [Run the server](#run-the-server-1)
+- [Mutations](#mutations)
+  - [Define Server-side mutation](#define-server-side-mutation)
+    - [Define the `RootMutation` type entrypoint definitions](#define-the-rootmutation-type-entrypoint-definitions)
+    - [Define the `RootMutation` resolver](#define-the-rootmutation-resolver)
+    - [Add the `RootMutation` resolver to the master resolvers](#add-the-rootmutation-resolver-to-the-master-resolvers)
+    - [Register the `RootMutation` type to the schema](#register-the-rootmutation-type-to-the-schema)
+    - [Test the implementation](#test-the-implementation)
+  - [Client-side mutation integration](#client-side-mutation-integration)
+    - [Create an `addItem` query](#create-an-additem-query)
+    - [Create an `AddItem` component](#create-an-additem-component)
+    - [Add the route to the `AddItem` component](#add-the-route-to-the-additem-component)
+    - [Test implementation](#test-implementation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # GraphQL Quick-Start Guide
+
+Goal: Learn how GraphQL development works on the server + client at a basic level. Hit the ground running with
+something working.
 
 The following uses Apollo tooling. Apollo was chosen because it was easy to develop with using their tooling compared to Relay Classic.
 
@@ -323,6 +368,11 @@ import { makeExecutableSchema } from 'graphql-tools'
 // the schema type only has two properties: query and mutations
 // the RootQuery contains the root entry points into graphQL
 // If you want to define more entry points, you add to RootQuery
+
+// Note: the RootQuery defined in `schema { }` is NOT the `import RootQuery`
+// It is the reference to the `type RootQuery` definition
+// Ex: if you renamed `type RootQuery` -> `type MasterQuery`, then
+// it should be `schema { query: MasterQuery }`
 const SchemaDefinition = `
   schema {
     query: RootQuery
@@ -380,6 +430,7 @@ This does not cover:
 
 - How to break up your GraphQL queries into fragments
 - How to perform mutations on your data (they're barely any different than defining calling a query)
+- Best practices on how to structure your files, break apart your components to be more **dumb**, etc
 
 ## Required libraries
 
@@ -456,15 +507,14 @@ export default {
   // this is a feature called template tags
   // https://developers.google.com/web/updates/2015/01/ES6-Template-Strings#tagged_templates
   getItemList: gql`query ItemListQuery {
-      items {
-        id
-        name,
-        owner {
-          username
-        }
+    items {
+      id
+      name,
+      owner {
+        username
       }
-    }`
-  }
+    }
+  }`
 }
 
 ```
@@ -476,8 +526,7 @@ export default {
 import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'react-apollo'
-import { Link } from 'react-router-dom'
-import { getItemList } from '../queries/item.queries.js'
+import itemQueries from '../queries/item.queries.js'
 
 class ItemList extends React.Component {
   render () {
@@ -528,14 +577,22 @@ ItemList.propTypes = {
 
 // wrap the graphql (Apollo) store around the component
 // and call the getItemList query when there is a need to fetch data
-const ItemListView = graphql(getItemList)(ItemList)
+const ItemListView = graphql(itemQueries.getItemList)(ItemList)
 
 export default ItemListView
 ```
 
+## Run the server
+
+`npm run start`
+
+http://localhost:3001/
+
 # Mutations
 
-Mutations involves updating data. The following will describe how to implement mutations
+Mutations involves updating data. The following will describe how to implement mutations.
+
+http://graphql.org/graphql-js/mutations-and-input-types/
 
 ## Define Server-side mutation
 
@@ -621,10 +678,139 @@ const schema = makeExecutableSchema({
     // New addition here, can be added in any position in this array
     RootMutation,
     UserType,
-    CapsuleType
+    ItemType
   ],
   resolvers
 })
 
 ```
 
+### Test the implementation
+
+Run the server, and try this query
+
+http://localhost:3000/graphiql?query=mutation%20newItem%20%7B%0A%20%20addItem(name%3A%22new.item%22%20desc%3A%20%22This%20is%20a%20new%20item%22%20ownerId%3A%201)%20%7B%0A%20%20%20%20id%0A%20%20%20%20name%0A%20%20%7D%0A%7D&operationName=newItem
+
+## Client-side mutation integration
+
+### Create an `addItem` query
+
+```javascript
+// queries/item.queries.js
+
+export default {
+  ...
+  // see https://www.learnapollo.com/tutorial-react/react-05/
+  //
+  addItem: gql`mutation addNewItem ($name: String!, $desc: String, $ownerId: ID!) {
+    addItem(name: $name, desc: $desc, ownerId: $ownerId) {
+      id
+    }
+  }`
+}
+
+```
+
+### Create an `AddItem` component
+
+```javascript
+// components/AddItem.jsx
+
+import React from 'react'
+import PropTypes from 'prop-types'
+import { graphql } from 'react-apollo'
+import itemQueries from '../queries/item.queries.js'
+
+class AddItem extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      name: '',
+      desc: ''
+    }
+  }
+
+  handleSave = () => { // eslint-disable-line no-undef
+    const {
+      name,
+      desc
+    } = this.state
+
+    const ownerId = 1
+
+    // see https://www.learnapollo.com/tutorial-react/react-05/
+    // "Using mutations in components"
+    this.props.mutate({variables: { name, desc, ownerId }}).then(() => {
+      // @todo bug: Item list doesn't refresh on redirect
+      this.props.history.replace('/')
+    })
+  }
+
+  render () {
+    return (
+      <div>
+        <input
+          placeholder='name'
+          value={this.state.name}
+          onChange={(e) => this.setState({name: e.target.value})}
+        />
+        <br /><br />
+        <input
+          onChange={(e) => this.setState({desc: e.target.value})}
+          placeholder='description'
+          value={this.state.desc}
+        />
+        <br /><br />
+        <button onClick={this.handleSave}>Save</button>
+      </div>
+    )
+  }
+}
+
+AddItem.propTypes = {
+  // When this prop is defined
+  // Apollo will look at the RootQuery.mutate schema and connect addItem
+  mutate: PropTypes.func.isRequired,
+  history: PropTypes.object
+}
+
+const AddItemWithMutation = graphql(itemQueries.addItem)(AddItem)
+
+export default AddItemWithMutation
+```
+
+### Add the route to the `AddItem` component
+
+```javascript
+// index.js
+
+...
+
+import ItemList from './components/ItemList.jsx'
+import AddItem from './components/AddItem.jsx'
+
+...
+
+ReactDOM.render((
+    <ApolloProvider client={client}>
+      <Router>
+        <div>
+          <Route exact path='/add' component={AddItem} />
+          <Route exact path='/' component={ItemList} />
+        </div>
+      </Router>
+    </ApolloProvider>
+  ),
+  document.getElementById('root')
+)
+
+```
+
+### Test implementation
+
+Make sure the GraphQL server is running, then start your client server.
+
+http://localhost:3001/add
+
+Input some values and hit add. It'll redirect to the item list,
+but you'll have to refresh to see your added item (someone come in and fix this please!)

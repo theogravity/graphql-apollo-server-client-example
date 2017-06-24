@@ -5,8 +5,20 @@
   "description": "Sample Apollo client",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "PORT=3001 react-scripts start"
   },
   "author": "Theo Gravity",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "apollo-client": "1.5.0",
+    "graphql-tag": "2.4.2",
+    "prop-types": "15.5.10",
+    "react": "15.6.1",
+    "react-apollo": "1.4.2",
+    "react-dom": "15.6.1",
+    "react-router-dom": "4.1.1"
+  },
+  "devDependencies": {
+    "react-scripts": "1.0.7"
+  }
 }
