@@ -119,7 +119,9 @@ import bodyParser from 'body-parser'
 // GraphQL Schema is imported here
 const graphQLSchema = `...`
 
-// enable cors support
+// enable cors support so when the client on a different host tries to query the server
+// the client will not be blocked
+// note: these are really insecure rules to use
 app.use('*', cors({
   origin: '*'
 }))
