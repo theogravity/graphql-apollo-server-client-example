@@ -144,6 +144,8 @@ http://graphql.org/learn/schema/
 
 ### Define Types
 
+Define types for objects you want to allow GraphQL to query on.
+
 ```javascript
 // schema/item/item.type.js
 
