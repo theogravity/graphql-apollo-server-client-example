@@ -278,9 +278,8 @@ In order to return the data back:
 ```
 
 - GraphQL attempts to map the object properties to the `Item` type (since the field `RootQuery.item` returns an `Item`)
-- GraphQL notices `owner` is missing from the returned data
-- GraphQL will now call a resolver for `Item.owner` to get back a user
-
+- GraphQL notices we need the `Item.owner` field, but the data is not included in the above returned data
+- GraphQL will now call a resolver for `Item.owner` to attach the owner
 
 ```javascript
 // schema/item/item.resolvers.js
