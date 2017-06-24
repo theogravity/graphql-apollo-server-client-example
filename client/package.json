@@ -1,0 +1,12 @@
+{
+  "name": "graphql-apollo-client-example",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Sample Apollo client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Theo Gravity",
+  "license": "MIT"
+}
