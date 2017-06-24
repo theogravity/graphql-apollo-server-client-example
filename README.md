@@ -66,12 +66,6 @@ https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebba
 
 Goal: Understand what server-side development / structure is like.
 
-This does not cover:
-
-- Defining a database and its accessors. You will not have a working server without implementing some kind of database / mock layer using this guide.
-  - I personally recommend http://knexjs.org/ and http://vincit.github.io/objection.js/ for setting up a database
-  - Alternatively, you can define an in-memory database, using arrays/variables to store data
-
 Resources used:
 
 http://dev.apollodata.com/tools/
@@ -422,8 +416,6 @@ http://localhost:3000/graphiql?query=query%20getItems%20%7B%0A%20%20items%20%7B%
 
 # Client-side Development
 
-https://www.learnapollo.com/tutorial-react/react-01
-
 Goal: Implement some really basic stuff to test the server implementation. Also understand what dev is like using the Apollo client.
 
 This does not cover:
@@ -431,6 +423,10 @@ This does not cover:
 - How to break up your GraphQL queries into fragments
 - How to perform mutations on your data (they're barely any different than defining calling a query)
 - Best practices on how to structure your files, break apart your components to be more **dumb**, etc
+
+Resources used:
+
+https://www.learnapollo.com/tutorial-react/react-01
 
 ## Required libraries
 
