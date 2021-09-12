@@ -1,4 +1,7 @@
-**UPDATE 12/16**: After spending months building a production-level GraphQL server complete with auth+ACL, I do not recommend the server-side approach described in this tutorial (this tutorial is fine for getting your feet wet, but it's not scalable), and recommend using the following libs instead:
+
+**Update 9/12/21**: I've been using `giraphql` with good success. See the example repo here: https://github.com/theogravity/graphql-giraphql-server-example/
+
+**UPDATE 12/16/19**: After spending months building a production-level GraphQL server complete with auth+ACL, I do not recommend the server-side approach described in this tutorial (this tutorial is fine for getting your feet wet, but it's not scalable), and recommend using the following libs instead:
 
 - https://github.com/graphql/graphql-js - The core difference between using this library and the approach described in this document is that you're programatically defining the schema. IMO, it gives you much more control over the logic of how the schema works. It also plays extremely well with `join-monster`. If you're building a large-scale GraphQL server, use programatic definitions instead.
 - https://github.com/Vincit/objection.js - (I know people are scared of the word ORM lately, but I promise you, this is extremely-light-weight. It uses `knex` for its operations - I use this library for mutations only. One extremely useful feature is that it supports a graph-based insert/update (aka upsert), where if your mutation input is nested and can affect multiple models, the `graphInsert`/ `graphUpdate` methods are extremely useful.)
